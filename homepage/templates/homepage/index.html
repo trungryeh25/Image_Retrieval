@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <style>
+        .card {border-color: white !important}
+        img {
+            display: block;
+            /* This rule is very important, please don't ignore this */
+            max-width: 100%;
+        }
+        #query_img {
+            height: 400px;
+            object-fit: contain;
+        }
+        #id_img {
+            border: 2px gray dashed;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+</head>
+<body style="padding: 30px">
+    <div class="row">
+        <div class="col-lg-12 text-center">
+            <h4 style="font-family: cursive; font-weight: bolder">
+                building
+                <span style="color: rgb(52, 107, 235);">S</span>
+                <span style="color: rgb(235, 64, 52);">E</span>
+                <span style="color: rgb(235, 226, 52);">A</span>
+                <span style="color: rgb(52, 107, 235);">R</span>
+                <span style="color: rgb(52, 235, 92);">C</span>
+                <span style="color: rgb(52, 107, 235);">H</span>
+            </h4>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-lg-3">
+            <form method = "post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="input-group mb-3" id="x_div" hidden>
+                    <span class="input-group-text"><b>x</b></span>
+                    <input name="x" type="number" value="{{x}}" class="form-control" id="x" aria-label="x" readonly>
+                    <input name="x0" type="number" value="{{x}}" class="form-control" id="x0" aria-label="x0" disabled hidden>
+                </div>
+                <div class="input-group mb-3" id="y_div" hidden>
+                    <span class="input-group-text"><b>y</b></span>
+                    <input name="y" type="number" value="{{y}}" class="form-control" id="y" aria-label="y" readonly>
+                    <input name="y0" type="number" value="{{y}}" class="form-control" id="y0" aria-label="y0" disabled hidden>
+                </div>
+                <div class="input-group mb-3" id="w_div" hidden>
+                    <span class="input-group-text"><b>w</b></span>
+                    <input name="w" type="number" value="{{w}}" class="form-control" id="w" aria-label="w" readonly>
+                    <input name="w0" type="number" value="{{w}}" class="form-control" id="w0" aria-label="w0" disabled hidden>
+                </div>
+                <div class="input-group mb-3" id="h_div" hidden>
+                    <span class="input-group-text"><b>h</b></span>
+                    <input name="h" type="number" value="{{h}}" class="form-control" id="h" aria-label="h" readonly>
+                    <input name="h0" type="number" value="{{h}}" class="form-control" id="h0" aria-label="h0" disabled hidden>
+                </div>
+
+                <input type="text" class="form-control" name="img_path" id="id_img_path" value="{{ query }}" readonly hidden>
+                <input type="number" class="form-control" name="img_number" id="id_img_number" value="{{ top_k }}" readonly hidden>
+                <p>
+                    <a id="renew" href="" hidden>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                            <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+                        </svg>
+                    </a>
+                    {% if query %}
+                        <input type="file" class="form-control" name="img" accept="image/*" id="id_img" >
+                        <div class="col-lg-12" id="query_img_div">
+                            <div class="card">
+                                <!-- <h6 class="text-left">Query</h6> -->
+                                <img id="query_img" src="{{ query }}" class="card-img-top" alt="Can not load image">
+                                <br>
+                            </div>
+                        </div>
+                        <div class="mb-3 form-check form-switch" id="use_full_div" hidden>
+                            <input class="form-check-input" type="checkbox" role="switch" name="use_full" id="use_full">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Use full image</label>
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="inputGroup-sizing-default">Show</span>
+                            <input type="number" class="form-control" name="topk" value="{{ top_k }}" required id="id_topk">
+                            <span class="input-group-text">results</span>
+                        </div>
+                    {% else %}
+                        <input type="file" class="form-control" name="img" accept="image/*" id="id_img" required>
+                        <div class="col-lg-12" id="query_img_div" hidden>
+                            <div class="card">
+                                <!-- <h6 class="text-left">Query</h6> -->
+                                <img id="query_img" src="{{ query }}" class="card-img-top" alt="Can not load image">
+                                <br>
+                            </div>
+                        </div>
+                        <div class="mb-3 form-check form-switch" id="use_full_div" hidden>
+                            <input class="form-check-input" type="checkbox" role="switch" name="use_full" id="use_full">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Use full image</label>
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="inputGroup-sizing-default">Show</span>
+                            <input type="number" class="form-control" name="topk" value="20" min="0" max="5064" required id="id_topk">
+                            <span class="input-group-text" id="inputGroup-sizing-default">results</span>
+                        </div>
+                    {% endif %}
+                </p>
+                <button type="submit" class="btn btn-outline-success" id="button-search">Search</button>
+            </form>
+        </div>
+        <div class="col-lg-9" style="padding-left: 30px;">
+            <div id="spinner" class="text-center" hidden>
+                <br>
+                <div class="spinner-grow spinner-grow-sm" role="status"></div>
+                <div class="spinner-grow spinner-grow-sm" role="status"></div>
+                <div class="spinner-grow spinner-grow-sm" role="status"></div>
+            </div>
+            {% if query %}
+            <div id="results">
+                <div class="row">
+                    <h6>About {{ top_k }} results ({{ time }}s)</h6>
+                    {% for i in images %}
+                        <div class="col-lg-2">
+                            <div class="card" data-bs-toggle="modal" data-bs-target="#resultmodal{{i}}">
+                                <img src="media/images/dataX/oxbuild_images-v1/{{ i }}.jpg" class="card-img-top" alt="Can not load image" height="200px">
+                                <br>
+                            </div>
+                        </div>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="resultmodal{{i}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <h6 class="card-text">{{ i }}</h6>
+                                        <img src="media/images/dataX/oxbuild_images-v1/{{ i }}.jpg" class="card-img-top" alt="Can not load image">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <br>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    														
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $("#button-search").on("click", function() {
+            var path_changed = $("#id_img").val().toString();
+            if (path_changed) {
+                $('#results').prop('hidden', true);
+                $('#spinner').prop('hidden', false);
+            }
+        });
+
+        $("#id_img").on("change", function() {
+            var path_changed = $("#id_img").val().toString();
+            $("#id_img").prop('hidden', true)
+            $("#renew").prop('hidden', false)
+            $('#use_full_div').prop('hidden', false);
+            //$('#x_div').prop('hidden', false);
+            //$('#y_div').prop('hidden', false);
+            //$('#w_div').prop('hidden', false);
+            //$('#h_div').prop('hidden', false);
+            $('#id_topk').attr('value', 20);
+            $("#query_img_div").prop('hidden', false);
+            $('#results').prop('hidden', true);
+            $("#query_img").attr('src', 'media\\images\\dataX\\oxbuild_images-v1\\' + path_changed.split('\\')[2]);
+            if (path_changed) {
+                var image = document.getElementById('query_img');
+                var cropper = new Cropper(image, {
+                    crop(event) {
+                        $('#x').val(parseInt(event.detail.x));
+                        $('#y').val(parseInt(event.detail.y));
+                        $('#w').val(parseInt(event.detail.width));
+                        $('#h').val(parseInt(event.detail.height));
+
+                        $('#x0').val(parseInt(event.detail.x));
+                        $('#y0').val(parseInt(event.detail.y));
+                        $('#w0').val(parseInt(event.detail.width));
+                        $('#h0').val(parseInt(event.detail.height));
+                    },
+                });
+            }
+        });
+
+
+        
+        $('#use_full').on("change", function() {
+            if ($('#use_full').is(":checked")) {
+                $('#x').val(0);
+                $('#y').val(0);
+                $('#w').val(0);
+                $('#h').val(0);
+            }
+            else {
+                $('#x').val($('#x0').val());
+                $('#y').val($('#y0').val());
+                $('#w').val($('#w0').val());
+                $('#h').val($('#h0').val());
+            }
+        })
+    </script>														
+</body>
+</html>
