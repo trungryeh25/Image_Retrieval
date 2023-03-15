@@ -1,0 +1,31 @@
+Hàm feature_extraction với model EfficientNetB7
+- input: image (224,224,3) -> (1, 224, 224, 3)
+- đi qua model: (1, 224, 224, 3) -> (1, 7, 7, 2560)
+- flatten: (1, 7, 7, 2560) -> (125440,)
+- normalize 
+=> output: (125440,)
+
+tạo index table:
+index   |   image path   |   image feature
+0           a/b/c/p0.jpg     [0.001, 0.002, ..., 0.123]
+1           a/b/c/p1.jpg     [0.001, 0.002, ..., 0.123]
+2           a/b/c/p2.jpg     [0.001, 0.002, ..., 0.123]
+3           a/b/c/p3.jpg     [0.001, 0.002, ..., 0.123]
+4           a/b/c/p4.jpg     [0.001, 0.002, ..., 0.123]
+5           a/b/c/p5.jpg     [0.001, 0.002, ..., 0.123]
+
+lưu trữ thành 2 file .npy 
++ feature_list.npy (chứa image feature)
++ feature_id.npy (chứa image path)
+
+-------------------------------------------------
+
+SEARCH
+
+- Đọc 2 file .npy -> feature_list, feature_id
+- Tạo KDTree với feature_list -> kd
+- kd.query(<img_feature>, <top_k>) -> dist, indx
+*indx là 1 list các index ứng với query input theo thứ tự top-2-bot
+- Show ảnh theo các path trong feature_id ứng với các indx
+
+
